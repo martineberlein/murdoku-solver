@@ -9,6 +9,9 @@ An SMT-based constraint solver for [Murdoku](https://murdoku.com/play), the popu
 >
 > *Disclaimer*: This is purely a fun personal exploration and is not intended to take away from the satisfaction of solving Murdoku puzzles by hand—the real magic is in the deduction!
 
+> [!IMPORTANT]
+> I really enjoy solving the puzzles myself, so I only add new clues (and transform them into constraints) after I have solved a case by hand!
+
 ---
 
 ## What is Murdoku?

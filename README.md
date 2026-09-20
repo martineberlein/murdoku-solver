@@ -1,6 +1,8 @@
-# murdoku-solver
+# Murdoku Solver
 
 An SMT-based constraint solver for [Murdoku](https://murdoku.com/play), the popular logic puzzle game where **Sudoku meets murder mystery** (created by Manuel Garand).
+
+![Murdoku](img/murdoku.png)
 
 ---
 

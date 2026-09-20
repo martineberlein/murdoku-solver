@@ -14,6 +14,7 @@ from murdoku_solver.clue import (
 from murdoku_solver.context import SolverContext
 from murdoku_solver.engine import MurdokuEngine
 from murdoku_solver.person import Person
+from murdoku_solver.printer import SolutionPrinter
 
 __all__ = [
     "BoardLayout",
@@ -32,4 +33,5 @@ __all__ = [
     "SolverContext",
     "MurdokuEngine",
     "Person",
+    "SolutionPrinter",
 ]

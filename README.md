@@ -40,58 +40,143 @@ pip install -e .
 
 ---
 
-## Quickstart
+## Example Walkthrough: 24-Hour Delivery (6×6)
 
-Run the bundled example script:
+Below is a complete, step-by-step walkthrough modeling and solving the first Murdoku case: **24-Hour Delivery**.
+
+<p align="center">
+  <img src="cases/24-hour-delivery/screenshot.png" alt="24-Hour Delivery Case" width="650" />
+</p>
+
+You can run this case directly:
 
 ```bash
-python example.py
+python cases/24-hour-delivery/solve.py
 ```
 
-### Python API Example
+### Step 1: Define Rooms and Board Layout
+
+The crime scene is a 6×6 grid partitioned into 5 distinct rooms:
+
+```python
+from murdoku_solver import BoardLayout
+
+layout = BoardLayout(width=6, height=6)
+
+# Define room bounding cells
+layout.add_room("DiningRoom", [(r, c) for r in range(4) for c in range(3)])
+layout.add_room("Bedroom", [(r, c) for r in range(2) for c in range(3, 6)])
+layout.add_room("Kitchen", [(r, c) for r in range(2, 4) for c in range(3, 6)])
+layout.add_room("Porch", [(r, c) for r in range(4, 6) for c in range(2)])
+layout.add_room("FrontYard", [(r, c) for r in range(4, 6) for c in range(2, 6)])
+```
+
+### Step 2: Add Objects and Obstacles
+
+Objects can be **passable** (characters can stand on them, like chairs and rugs) or **impassable** (obstacles blocking the square, like tables, beds, and shrubs):
+
+```python
+# Passable furniture & decor
+layout.add_object("DiningChairHead", "chair", [(0, 1)], passable=True)
+layout.add_object("DiningChairLeft1", "chair", [(1, 0)], passable=True)
+layout.add_object("DiningChairLeft2", "chair", [(2, 0)], passable=True)
+layout.add_object("PorchChair", "chair", [(5, 1)], passable=True)
+
+layout.add_object("BedroomCarpet", "carpet", [(0, 5), (1, 5)], passable=True)
+layout.add_object("KitchenCarpet", "carpet", [(2, 3), (2, 4)], passable=True)
+layout.add_object("PorchCarpet", "carpet", [(4, 1)], passable=True)
+
+# Impassable obstacles
+layout.add_object("DiningTable", "table", [(1, 1), (2, 1)], passable=False)
+layout.add_object("Bed", "bed", [(0, 3), (0, 4)], passable=False)
+layout.add_object("KitchenCounter", "table", [(3, 3), (3, 4)], passable=False)
+
+layout.add_object("DiningPlant", "plant", [(3, 0)], passable=False)
+layout.add_object("BedroomPlant", "plant", [(1, 4)], passable=False)
+layout.add_object("YardShrub1", "shrub", [(4, 3)], passable=False)
+layout.add_object("YardShrub2", "shrub", [(5, 4)], passable=False)
+
+layout.add_object("DeliveryBox", "box", [(4, 0)], passable=False)
+```
+
+### Step 3: Define the Characters
+
+Every person on the board is either a suspect or the victim:
+
+```python
+from murdoku_solver import Person
+
+people = [
+    Person("Alexander"),
+    Person("Bella"),
+    Person("Carol"),
+    Person("Dalia"),
+    Person("Evangeline"),
+    Person("Viraj", is_victim=True),
+]
+```
+
+### Step 4: Translate the In-Game Clues
+
+Each statement from the case sheet translates directly into a solver constraint:
 
 ```python
 from murdoku_solver import (
     AloneWithVictim,
-    BoardLayout,
-    EastOf,
+    BesideCategory,
     InRoom,
-    MurdokuEngine,
     OnCategory,
-    Person,
+    OnlyPersonOnCategory,
 )
 
-# 1. Define the board layout (4x4)
-layout = BoardLayout(width=4, height=4)
-layout.add_room("NorthWing", [(r, c) for r in range(2) for c in range(4)])
-layout.add_room("SouthWing", [(r, c) for r in range(2, 4) for c in range(4)])
-
-# 2. Add objects and obstacles
-layout.add_object("FloralRug", "rug", [(0, 0), (0, 1)], passable=True)
-layout.add_object("Pillar", "rock", [(2, 2)], passable=False)
-
-# 3. Define the characters
-people = [
-    Person("Victim", is_victim=True),
-    Person("Alice"),
-    Person("Bob"),
-]
-
-# 4. Define the clues
 clues = [
-    OnCategory("Victim", "rug"),       # Victim must be at (0, 0) or (0, 1)
-    InRoom("Alice", "NorthWing"),      # Alice is in the NorthWing
-    AloneWithVictim("Victim"),         # Exactly one suspect in the victim's room
-    EastOf("Bob", "Alice"),            # Bob's column > Alice's column
+    BesideCategory("Alexander", "box"),              # "He was beside the box."
+    OnCategory("Bella", "chair"),                    # "She was sitting in a chair."
+    OnlyPersonOnCategory("Carol", "carpet"),         # "She was the only person on a carpet."
+    InRoom("Dalia", "Bedroom"),                      # "She was in the Bedroom."
+    BesideCategory("Evangeline", ["shrub", "plant"]), # "She was either beside a shrub or a plant."
+    AloneWithVictim("Viraj"),                        # "The Victim. He was alone with the murderer."
 ]
+```
 
-# 5. Solve
+### Step 5: Solve and Format Output
+
+```python
+from murdoku_solver import MurdokuEngine, SolutionPrinter
+
 engine = MurdokuEngine(layout, people, clues)
 solution = engine.solve()
 
-print("Solution:", solution)
-# Output: {'Victim': (0, 1), 'Alice': (1, 0), 'Bob': (2, 3)}
+printer = SolutionPrinter(layout, people)
+printer.print_solution(solution, title="Case: 24-Hour Delivery (6x6)")
 ```
+
+### Output
+
+```text
+=== Case: 24-Hour Delivery (6x6) ===
+Solution found:
+  Alexander  (Suspect): Row 5, Col 0
+  Bella      (Suspect): Row 0, Col 1
+  Carol      (Suspect): Row 2, Col 4
+  Dalia      (Suspect): Row 1, Col 3
+  Evangeline (Suspect): Row 4, Col 2
+  Viraj      (Victim ): Row 3, Col 5
+
+Grid (R0-R5 top to bottom, C0-C5 left to right):
+   C0 C1 C2 C3 C4 C5
+R0  .  B  .  .  .  . 
+R1  .  .  .  D  .  . 
+R2  .  .  .  .  C  . 
+R3  .  .  .  .  .  V 
+R4  .  .  E  .  .  . 
+R5  A  .  .  .  .  . 
+
+Victim Viraj was in the Kitchen.
+The murderer alone with Viraj was: Carol!
+```
+
+---
 
 - Official Murdoku Game: [murdoku.com/play](https://murdoku.com/play)
 - Z3 Theorem Prover: [github.com/Z3Prover/z3](https://github.com/Z3Prover/z3)

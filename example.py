@@ -1,16 +1,3 @@
-# murdoku-solver
-
-Solver for the popular Murdoku Logic Puzzle
-
-## Installation
-
-```bash
-pip install -e .
-```
-
-## Example Usage
-
-```python
 from murdoku_solver import (
     AloneWithVictim,
     BoardLayout,
@@ -45,4 +32,3 @@ if __name__ == "__main__":
     engine = MurdokuEngine(layout, people, clues)
     solution = engine.solve()
     print("Solution:", solution)
-```

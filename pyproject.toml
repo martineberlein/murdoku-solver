@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "murdoku-solver"
+version = "0.1.0"
+description = "Solver for the popular Murdoku Logic Puzzle"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "z3-solver>=4.12.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]

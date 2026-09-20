@@ -85,3 +85,59 @@ class AloneWithVictim(Clue):
             == 1
         )
 
+
+class BesideCategory(Clue):
+    """Person is directly adjacent (horizontally or vertically) to an object of the given category."""
+
+    def __init__(self, person: str, category: str | list[str]):
+        self.person = person
+        self.categories = [category] if isinstance(category, str) else category
+
+    def apply(self, ctx: SolverContext):
+        cells = [
+            (r, c)
+            for obj in ctx.layout.objects.values()
+            if obj.category in self.categories
+            for r, c in obj.cells
+        ]
+        pr, pc = ctx.r[self.person], ctx.c[self.person]
+        neighbor_checks = []
+        for r, c in cells:
+            neighbor_checks.extend(
+                [
+                    z3.And(pr == r + 1, pc == c),
+                    z3.And(pr == r - 1, pc == c),
+                    z3.And(pr == r, pc == c + 1),
+                    z3.And(pr == r, pc == c - 1),
+                ]
+            )
+        ctx.solver.add(z3.Or(neighbor_checks))
+
+
+class OnlyPersonOnCategory(Clue):
+    """Person is on an object of the given category, and no other person is on any object of that category."""
+
+    def __init__(self, person: str, category: str):
+        self.person = person
+        self.category = category
+
+    def apply(self, ctx: SolverContext):
+        cells = [
+            (r, c)
+            for obj in ctx.layout.objects.values()
+            if obj.category == self.category
+            for r, c in obj.cells
+        ]
+        pr, pc = ctx.r[self.person], ctx.c[self.person]
+        ctx.solver.add(z3.Or([z3.And(pr == r, pc == c) for r, c in cells]))
+        for name in ctx.people:
+            if name != self.person:
+                opr, opc = ctx.r[name], ctx.c[name]
+                for r, c in cells:
+                    ctx.solver.add(z3.Not(z3.And(opr == r, opc == c)))
+
+
+BesideObject = BesideCategory
+OnlyPersonOn = OnlyPersonOnCategory
+
+

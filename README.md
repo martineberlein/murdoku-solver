@@ -179,7 +179,28 @@ Victim Viraj was in the Kitchen.
 The murderer alone with Viraj was: Carol!
 ```
 
+
+## Frequently Asked Questions (FAQ)
+
+### Doesn't an automated solver ruin the fun?
+> Not at all! The rule is that I only implement clues for cases I've already solved by hand. Playing the game comes first; formalizing the deduction in code is just a fun post-game exercise.
+
+### Why Z3 instead of brute-force backtracking?
+> Backtracking is blind trial-and-error. An SMT solver reasons over symbolic constraints (SAT + linear integer arithmetic), mirroring real deductive logic and enabling mathematical proofs of uniqueness.
+
+### Can this handle 16×16 Expert puzzles?
+> Easily. Due to the rook rule (1 person per row/column), a 16×16 grid only introduces 32 integer variables. Z3 solves this class of problem in under 200 ms.
+
+### Can it prove a solution is unique?
+> Yes. Asserting $\neg S$ against an existing solution $S$ and checking for `unsat` proves no other valid placement exists.
+
+### How do new clues get added?
+> Incrementally. Each newly encountered clue type becomes a subclass of `Clue` implementing its respective Z3 constraints.
+
 ---
+
+## References
 
 - Official Murdoku Game: [murdoku.com/play](https://murdoku.com/play)
 - Z3 Theorem Prover: [github.com/Z3Prover/z3](https://github.com/Z3Prover/z3)
+

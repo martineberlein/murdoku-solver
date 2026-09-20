@@ -4,6 +4,11 @@ An SMT-based constraint solver for [Murdoku](https://murdoku.com/play), the popu
 
 ![Murdoku](img/murdoku.png)
 
+> [!NOTE]
+> **Work in Progress**: This project is under active development. More puzzle clues, constraints, and solver operations are currently being added.
+>
+> *Disclaimer*: This is purely a fun personal exploration and is not intended to take away from the satisfaction of solving Murdoku puzzles by hand—the real magic is in the deduction!
+
 ---
 
 ## What is Murdoku?

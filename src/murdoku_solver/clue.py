@@ -46,13 +46,33 @@ class OnCategory(Clue):
 
 
 class InRoom(Clue):
-    def __init__(self, person: str, room: str):
+    """Person is in one of the specified rooms."""
+
+    def __init__(self, person: str, room: str | list[str]):
         self.person = person
-        self.room = room
+        self.rooms = [room] if isinstance(room, str) else room
 
     def apply(self, ctx: SolverContext):
-        rid = ctx.room_ids[self.room]
-        ctx.solver.add(ctx.room_fn(ctx.r[self.person], ctx.c[self.person]) == rid)
+        pr, pc = ctx.r[self.person], ctx.c[self.person]
+        room_checks = [
+            ctx.room_fn(pr, pc) == ctx.room_ids[r] for r in self.rooms
+        ]
+        ctx.solver.add(z3.Or(room_checks))
+
+
+class Alone(Clue):
+    """Person is alone in their room (no other person shares the room)."""
+
+    def __init__(self, person: str):
+        self.person = person
+
+    def apply(self, ctx: SolverContext):
+        pr, pc = ctx.r[self.person], ctx.c[self.person]
+        p_room = ctx.room_fn(pr, pc)
+        for other in ctx.people:
+            if other != self.person:
+                ctx.solver.add(ctx.room_fn(ctx.r[other], ctx.c[other]) != p_room)
+
 
 
 class AloneWithVictim(Clue):

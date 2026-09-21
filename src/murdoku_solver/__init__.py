@@ -1,5 +1,6 @@
 from murdoku_solver.board import BoardLayout, BoardObject, Room
 from murdoku_solver.clue import (
+    Alone,
     AloneWithVictim,
     BesideCategory,
     BesideObject,
@@ -21,6 +22,7 @@ __all__ = [
     "BoardObject",
     "Room",
     "Clue",
+    "Alone",
     "AloneWithVictim",
     "BesideCategory",
     "BesideObject",

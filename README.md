@@ -2,6 +2,9 @@
 
 An SMT-based constraint solver for [Murdoku](https://murdoku.com/play), the popular logic puzzle game where **Sudoku meets murder mystery** (created by Manuel Garand).
 
+> [!NOTE]
+> **Companion blog post**: I wrote up the motivation and design behind this project in more detail — check it out at [martin-eberlein.com/blog/murdoku-solver.html](https://martin-eberlein.com/blog/murdoku-solver.html).
+
 ![Murdoku](img/murdoku.png)
 
 > [!NOTE]
